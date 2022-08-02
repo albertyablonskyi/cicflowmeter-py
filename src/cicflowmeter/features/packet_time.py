@@ -30,6 +30,11 @@ class PacketTime:
         return packet_times
 
     def get_packet_iat(self, packet_direction=None):
+        """
+        Return Inter-arrival times in milliseconds
+        :param packet_direction:
+        :return: array of iats
+        """
         if packet_direction is not None:
             packets = [
                 packet
@@ -41,7 +46,7 @@ class PacketTime:
 
         packet_iat = []
         for i in range(1, len(packets)):
-            packet_iat.append(1e6 * float(packets[i].time - packets[i - 1].time))
+            packet_iat.append(1e3 * float(packets[i].time - packets[i - 1].time))
 
         return packet_iat
 

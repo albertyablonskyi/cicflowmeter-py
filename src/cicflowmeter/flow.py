@@ -20,7 +20,7 @@ class Flow:
 
         Args:
             packet (Any): A packet from the network.
-            direction (Enum): The direction the packet is going ove the wire.
+            direction (Enum): The direction the packet is going over the wire.
         """
 
         (
@@ -100,7 +100,7 @@ class Flow:
             "protocol": self.protocol,
             # Basic information from packet times
             "timestamp": packet_time.get_time_stamp(),
-            "flow_duration": 1e6 * packet_time.get_duration(),
+            "flow_duration": 1e3 * packet_time.get_duration(),  # in milliseconds
             "flow_byts_s": flow_bytes.get_rate(),
             "flow_pkts_s": packet_count.get_rate(),
             "fwd_pkts_s": packet_count.get_rate(PacketDirection.FORWARD),
@@ -214,7 +214,7 @@ class Flow:
 
         if self.start_timestamp != 0:
             self.flow_interarrival_time.append(
-                1e6 * (packet.time - self.latest_timestamp)
+                1e3 * (packet.time - self.latest_timestamp)
             )
 
         self.latest_timestamp = max([packet.time, self.latest_timestamp])
@@ -237,7 +237,7 @@ class Flow:
         """Update subflow
 
         Args:
-            packet: Packet to be parse as subflow
+            packet: Packet to be parsed as subflow
 
         """
         last_timestamp = (
@@ -256,8 +256,8 @@ class Flow:
         if (current_time - self.last_active) > constants.ACTIVE_TIMEOUT:
             duration = abs(float(self.last_active - self.start_active))
             if duration > 0:
-                self.active.append(1e6 * duration)
-            self.idle.append(1e6 * (current_time - self.last_active))
+                self.active.append(1e3 * duration)
+            self.idle.append(1e3 * (current_time - self.last_active))
             self.start_active = current_time
             self.last_active = current_time
         else:

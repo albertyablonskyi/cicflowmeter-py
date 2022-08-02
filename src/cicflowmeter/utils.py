@@ -22,12 +22,12 @@ def get_statistics(alist: list):
     """Get summary statistics of a list"""
     iat = dict()
 
-    if len(alist) > 1:
+    if len(alist) > 0:
         iat["total"] = sum(alist)
         iat["max"] = max(alist)
         iat["min"] = min(alist)
         iat["mean"] = numpy.mean(alist)
-        iat["std"] = numpy.sqrt(numpy.var(alist))
+        iat["std"] = numpy.std(alist)
     else:
         iat["total"] = 0
         iat["max"] = 0
