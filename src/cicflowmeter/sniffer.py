@@ -2,7 +2,7 @@ import argparse
 
 from scapy.sendrecv import AsyncSniffer
 
-from .flow_session import generate_session_class
+from cicflowmeter.flow_session import generate_session_class
 
 
 def create_sniffer(

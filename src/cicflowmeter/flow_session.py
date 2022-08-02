@@ -3,9 +3,9 @@ from collections import defaultdict
 from scapy.all import TCP
 from scapy.sessions import DefaultSession
 
-from .features.context.packet_direction import PacketDirection
-from .features.context.packet_flow_key import get_packet_flow_key
-from .flow import Flow
+from cicflowmeter.features.context.packet_direction import PacketDirection
+from cicflowmeter.features.context.packet_flow_key import get_packet_flow_key
+from cicflowmeter.flow import Flow
 
 EXPIRED_UPDATE = 120
 MACHINE_LEARNING_API = "http://localhost:8000/predict"

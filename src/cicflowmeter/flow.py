@@ -1,15 +1,15 @@
 from enum import Enum
 from typing import Any
 
-from . import constants
-from .features.context import packet_flow_key
-from .features.context.packet_direction import PacketDirection
-from .features.flag_count import FlagCount
-from .features.flow_bytes import FlowBytes
-from .features.packet_count import PacketCount
-from .features.packet_length import PacketLength
-from .features.packet_time import PacketTime
-from .utils import get_statistics
+from cicflowmeter import constants
+from cicflowmeter.features.context import packet_flow_key
+from cicflowmeter.features.context.packet_direction import PacketDirection
+from cicflowmeter.features.flag_count import FlagCount
+from cicflowmeter.features.flow_bytes import FlowBytes
+from cicflowmeter.features.packet_count import PacketCount
+from cicflowmeter.features.packet_length import PacketLength
+from cicflowmeter.features.packet_time import PacketTime
+from cicflowmeter.utils import get_statistics
 
 
 class Flow:

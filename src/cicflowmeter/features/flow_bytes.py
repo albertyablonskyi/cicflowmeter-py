@@ -1,7 +1,7 @@
 from scapy.layers.inet import IP, TCP
 
-from .context.packet_direction import PacketDirection
-from .packet_time import PacketTime
+from cicflowmeter.features.context.packet_direction import PacketDirection
+from cicflowmeter.features.packet_time import PacketTime
 
 
 class FlowBytes:
