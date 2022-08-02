@@ -2,7 +2,7 @@
 
 import io
 import os
-
+import importlib
 from setuptools import find_packages, setup
 
 # Package meta-data.
@@ -45,19 +45,15 @@ except FileNotFoundError:
     long_description = DESCRIPTION
 
 # Load the package's __version__.py module as a dictionary.
-about = {}
 if not VERSION:
-    prefix = "src"
     project_slug = NAME.lower().replace("-", "_").replace(" ", "_")
-    with open(os.path.join(here, prefix, project_slug, "__init__.py")) as f:
-        exec(f.read(), about)
-else:
-    about["__version__"] = VERSION
+    about = importlib.import_module(project_slug)
+    VERSION = about.__version__
 
 # Where the magic happens:
 setup(
     name=NAME,
-    version=about["__version__"],
+    version=VERSION,
     description=DESCRIPTION,
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -65,9 +61,9 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    packages=find_packages("src"),
+    packages=find_packages(),
     # package_dir={"cicflowmeter": "src/cicflowmeter"},
-    package_dir={"": "src"},
+    # package_dir={"": "cicflowmeter"},
     entry_points={
         "console_scripts": ["cicflowmeter=cicflowmeter.sniffer:main"],
     },
