@@ -45,15 +45,15 @@ except FileNotFoundError:
     long_description = DESCRIPTION
 
 # Load the package's __version__.py module as a dictionary.
-if not VERSION:
-    project_slug = NAME.lower().replace("-", "_").replace(" ", "_")
-    about = importlib.import_module(project_slug)
-    VERSION = about.__version__
+# if not VERSION:
+#     project_slug = NAME.lower().replace("-", "_").replace(" ", "_")
+#     about = importlib.import_module(project_slug)
+#     VERSION = about.__version__
 
 # Where the magic happens:
 setup(
     name=NAME,
-    version=VERSION,
+    version=__import__('cicflowmeter').__version__,
     description=DESCRIPTION,
     long_description=long_description,
     long_description_content_type="text/markdown",
