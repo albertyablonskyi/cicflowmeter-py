@@ -1,7 +1,7 @@
 #!/usr/bin/env python
+from scapy.layers.inet import IP
 
-
-from .packet_direction import PacketDirection
+from cicflowmeter.features.context.packet_direction import PacketDirection
 
 
 def get_packet_flow_key(packet, direction) -> tuple:
@@ -32,8 +32,15 @@ def get_packet_flow_key(packet, direction) -> tuple:
         raise Exception("Only TCP protocols are supported.")
 
     if direction == PacketDirection.FORWARD:
-        dest_ip = packet["IP"].dst
-        src_ip = packet["IP"].src
+        if packet.haslayer(IP):
+            # For IP v4
+            dest_ip = packet["IP"].dst
+            src_ip = packet["IP"].src
+        else:
+            # For IP v6
+            dest_ip = packet["IPv6"].dst
+            src_ip = packet["IPv6"].src
+
         # dest_mac = packet["Ether"].dst
         # src_mac = packet["Ether"].src
         src_port = packet[protocol].sport

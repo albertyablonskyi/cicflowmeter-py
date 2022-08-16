@@ -1,3 +1,5 @@
+from scapy.all import TCP
+
 class FlagCount:
     """This class extracts features related to the Flags Count."""
 
@@ -25,10 +27,10 @@ class FlagCount:
             (
                 packet
                 for packet, direction in self.feature.packets
-                if direction == packet_direction
+                if direction == packet_direction and packet.haslayer(TCP)
             )
             if packet_direction is not None
-            else (packet for packet, _ in self.feature.packets)
+            else (packet for packet, _ in self.feature.packets if packet.haslayer(TCP))
         )
 
         for packet in packets:
