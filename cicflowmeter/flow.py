@@ -1,6 +1,8 @@
 from enum import Enum
 from typing import Any
 
+from scapy.all import TCP
+
 from cicflowmeter import constants
 from cicflowmeter.features.context import packet_flow_key
 from cicflowmeter.features.context.packet_direction import PacketDirection
@@ -30,8 +32,11 @@ class Flow:
             self.dest_port
         ) = packet_flow_key.get_packet_flow_key(packet, direction)
 
+        self.fwd_fin_flags = 0
+        self.bwd_fin_flags = 0
         self.name = "Flow {}".format(fid)
-
+        self.id = fid
+        self.packets_indexes = []
         self.packets = []
         self.flow_interarrival_time = []
         self.latest_timestamp = 0
@@ -46,24 +51,24 @@ class Flow:
         self.active = []
         self.idle = []
 
-        self.forward_bulk_last_timestamp = 0
-        self.forward_bulk_start_tmp = 0
-        self.forward_bulk_count = 0
-        self.forward_bulk_count_tmp = 0
-        self.forward_bulk_duration = 0
-        self.forward_bulk_packet_count = 0
-        self.forward_bulk_size = 0
-        self.forward_bulk_size_tmp = 0
-        self.backward_bulk_last_timestamp = 0
-        self.backward_bulk_start_tmp = 0
-        self.backward_bulk_count = 0
-        self.backward_bulk_count_tmp = 0
-        self.backward_bulk_duration = 0
-        self.backward_bulk_packet_count = 0
-        self.backward_bulk_size = 0
-        self.backward_bulk_size_tmp = 0
+        # self.forward_bulk_last_timestamp = 0
+        # self.forward_bulk_start_tmp = 0
+        # self.forward_bulk_count = 0
+        # self.forward_bulk_count_tmp = 0
+        # self.forward_bulk_duration = 0
+        # self.forward_bulk_packet_count = 0
+        # self.forward_bulk_size = 0
+        # self.forward_bulk_size_tmp = 0
+        # self.backward_bulk_last_timestamp = 0
+        # self.backward_bulk_start_tmp = 0
+        # self.backward_bulk_count = 0
+        # self.backward_bulk_count_tmp = 0
+        # self.backward_bulk_duration = 0
+        # self.backward_bulk_packet_count = 0
+        # self.backward_bulk_size = 0
+        # self.backward_bulk_size_tmp = 0
 
-    def get_data(self) -> dict:
+    def get_data(self, flow_id="") -> dict:
         """This method obtains the values of the features extracted from each flow.
 
         Note:
@@ -92,6 +97,7 @@ class Flow:
         idle_stat = get_statistics(self.idle)
 
         data = {
+            "flow_id": flow_id,
             # Basic IP information
             "src_ip": self.src_ip,
             "dst_ip": self.dest_ip,
@@ -168,48 +174,51 @@ class Flow:
             "idle_min": float(idle_stat["min"]),
             "idle_mean": float(idle_stat["mean"]),
             "idle_std": float(idle_stat["std"]),
-            "fwd_byts_b_avg": float(
-                flow_bytes.get_bytes_per_bulk(PacketDirection.FORWARD)
-            ),
-            "fwd_pkts_b_avg": float(
-                flow_bytes.get_packets_per_bulk(PacketDirection.FORWARD)
-            ),
-            "bwd_byts_b_avg": float(
-                flow_bytes.get_bytes_per_bulk(PacketDirection.REVERSE)
-            ),
-            "bwd_pkts_b_avg": float(
-                flow_bytes.get_packets_per_bulk(PacketDirection.REVERSE)
-            ),
-            "fwd_blk_rate_avg": float(
-                flow_bytes.get_bulk_rate(PacketDirection.FORWARD)
-            ),
-            "bwd_blk_rate_avg": float(
-                flow_bytes.get_bulk_rate(PacketDirection.REVERSE)
-            ),
+            # "fwd_byts_b_avg": float(
+            #     flow_bytes.get_bytes_per_bulk(PacketDirection.FORWARD)
+            # ),
+            # "fwd_pkts_b_avg": float(
+            #     flow_bytes.get_packets_per_bulk(PacketDirection.FORWARD)
+            # ),
+            # "bwd_byts_b_avg": float(
+            #     flow_bytes.get_bytes_per_bulk(PacketDirection.REVERSE)
+            # ),
+            # "bwd_pkts_b_avg": float(
+            #     flow_bytes.get_packets_per_bulk(PacketDirection.REVERSE)
+            # ),
+            # "fwd_blk_rate_avg": float(
+            #     flow_bytes.get_bulk_rate(PacketDirection.FORWARD)
+            # ),
+            # "bwd_blk_rate_avg": float(
+            #     flow_bytes.get_bulk_rate(PacketDirection.REVERSE)
+            # ),
+            "noofpackets": len(self.packets_indexes),
+            "packets": "_".join(map(str, self.packets_indexes)),
         }
 
         # Duplicated features
-        data["fwd_seg_size_avg"] = data["fwd_pkt_len_mean"]
-        data["bwd_seg_size_avg"] = data["bwd_pkt_len_mean"]
-        data["cwe_flag_count"] = data["fwd_urg_flags"]
-        data["subflow_fwd_pkts"] = data["tot_fwd_pkts"]
-        data["subflow_bwd_pkts"] = data["tot_bwd_pkts"]
-        data["subflow_fwd_byts"] = data["totlen_fwd_pkts"]
-        data["subflow_bwd_byts"] = data["totlen_bwd_pkts"]
+        # data["fwd_seg_size_avg"] = data["fwd_pkt_len_mean"]
+        # data["bwd_seg_size_avg"] = data["bwd_pkt_len_mean"]
+        # data["cwe_flag_count"] = data["fwd_urg_flags"]
+        # data["subflow_fwd_pkts"] = data["tot_fwd_pkts"]
+        # data["subflow_bwd_pkts"] = data["tot_bwd_pkts"]
+        # data["subflow_fwd_byts"] = data["totlen_fwd_pkts"]
+        # data["subflow_bwd_byts"] = data["totlen_bwd_pkts"]
 
         return data
 
-    def add_packet(self, packet: Any, direction: Enum) -> None:
+    def add_packet(self, packet: Any, direction: Enum, index: int) -> None:
         """Adds a packet to the current list of packets.
 
         Args:
             packet: Packet to be added to a flow
             direction: The direction the packet is going in that flow
-
+            index: packet index in the PCAP file
         """
         self.packets.append((packet, direction))
 
-        self.update_flow_bulk(packet, direction)
+        self.packets_indexes.append(index)
+        # self.update_flow_bulk(packet, direction)
         self.update_subflow(packet)
 
         if self.start_timestamp != 0:
@@ -232,6 +241,12 @@ class Flow:
         if self.start_timestamp == 0:
             self.start_timestamp = packet.time
             self.protocol = packet.proto
+
+        if packet.haslayer(TCP) and "F" in str(packet[TCP].flags):
+            if direction == PacketDirection.FORWARD:
+                self.fwd_fin_flags += 1
+            else:
+                self.bwd_fin_flags += 1
 
     def update_subflow(self, packet):
         """Update subflow
@@ -343,3 +358,6 @@ class Flow:
     @property
     def duration(self):
         return self.latest_timestamp - self.start_timestamp
+
+    def __str__(self):
+        return self.name
