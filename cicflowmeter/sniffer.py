@@ -1,32 +1,28 @@
-import argparse
 import sys
 from pathlib import Path
+from functools import partial
 
+import cloup
 from scapy.sendrecv import AsyncSniffer
-
+from cicflowmeter import __version__
 from cicflowmeter.flow_session import generate_session_class
-# from cicflowmeter.aysncreader import AsyncReader
 
 
-def create_sniffer_for_pcap(
-    input_file, output_mode, output_directory, dump_incomplete_flows
+def create_sniffer(
+    input_interface, input_file, output_mode, output_directory, dump_incomplete_flows, nb_workers
 ):
+    if input_file:
+        partial_sniffer = partial(AsyncSniffer, offline=input_file)
+        input_source = input_file
+    else:
+        partial_sniffer = partial(AsyncSniffer, iface=input_interface)
+        input_source = input_interface
+
     NewFlowSession = generate_session_class(
-        input_file, output_mode, output_directory, dump_incomplete_flows, show_packet_count=True
+        input_source, output_mode, output_directory, dump_incomplete_flows, nb_workers, show_packet_count=True
     )
 
-
-    # return AsyncReader(
-    #     offline=input_file,
-    #     filter="ip and (tcp or udp)",
-    #     prn=None,
-    #     session=NewFlowSession,
-    #     # timeout=200,
-    #     store=False,
-    # )
-
-    return AsyncSniffer(
-        offline=input_file,
+    return partial_sniffer(
         filter="ip and (tcp or udp)",
         prn=None,
         session=NewFlowSession,
@@ -34,68 +30,27 @@ def create_sniffer_for_pcap(
     )
 
 
-def create_sniffer_for_interface(
-    input_interface, output_mode, output_directory
-):
-    NewFlowSession = generate_session_class(input_interface, output_mode, output_directory)
-
-    return AsyncSniffer(
-        iface=input_interface,
-        filter="ip and (tcp or udp)",
-        prn=None,
-        session=NewFlowSession,
-        store=False,
-    )
-
-
-def main():
-    parser = argparse.ArgumentParser()
-
-    input_group = parser.add_mutually_exclusive_group(required=True)
-    input_group.add_argument(
-        "-i",
-        "--interface",
-        action="store",
-        dest="input_interface",
-        help="capture online data from INPUT_INTERFACE",
-    )
-
-    input_group.add_argument(
-        "-f",
-        "--file",
-        action="store",
-        dest="input_file",
-        help="capture offline data from a PCAP file or a folder containing PCAP files",
-    )
-
-    parser.add_argument(
-        "-c",
-        "--csv",
-        action="store_const",
-        const="csv",
-        dest="output_mode",
-        help="output flows as csv",
-    )
-
-    parser.add_argument(
-        "--in",
-        action="store_true",
-        dest="dump_incomplete_flows",
-        help="Dump incomplete flows to the csv file before existing the program",
-        default=False
-    )
-
-    parser.add_argument(
-        "--dir",
-        dest="output_directory",
-        help="output directory (in csv mode)",
-        default=str(Path.cwd())
-    )
-
-    args = parser.parse_args()
-
-    input_file = args.input_file
-    input_interface = args.input_interface
+@cloup.command(show_constraints=True)
+@cloup.constraints.require_one(
+    cloup.option("-i", "--interface", "input_interface", default=None, type=str,
+                 help="Capture live data from the network interface.", multiple=False),
+    cloup.option("-f", "--pfile", "input_file", default=None,
+                 help="capture offline data from a PCAP file or a folder containing PCAP files.",
+                 type=cloup.Path(exists=True, readable=True), multiple=False)
+)
+@cloup.option("-c", "--csv", is_flag=True, help="output flows as csv")
+@cloup.option("-w", "--workers", type=int, default=2, multiple=False, show_default=True,
+              help="No. of workers to write flows to a CSV file.")
+@cloup.option("--in", "dump_incomplete_flows", is_flag=True,
+              help="Dump incomplete flows to the csv file before existing the program.")
+@cloup.option("--dir", "output_directory", help="output directory (in csv mode). [default: current directory]", default=str(Path.cwd()),
+              type=cloup.Path(file_okay=False, exists=True, writable=True), multiple=False)
+@cloup.version_option(version=__version__)
+def main(input_interface, input_file, csv, workers, dump_incomplete_flows, output_directory):
+    if csv:
+        output_mode = "csv"
+    else:
+        output_mode = ""
 
     assert (input_file is None) ^ (input_interface is None)
 
@@ -110,11 +65,13 @@ def main():
 
         for nb, ifile in enumerate(input_files):
             print(f"==> {nb+1}. Processing file: {ifile}")
-            sniffer = create_sniffer_for_pcap(
+            sniffer = create_sniffer(
+                input_interface,
                 ifile,
-                args.output_mode,
-                args.output_directory,
-                args.dump_incomplete_flows,
+                output_mode,
+                output_directory,
+                dump_incomplete_flows,
+                workers
             )
 
             sniffer.start()
@@ -130,10 +87,13 @@ def main():
                     sniffer.stop()
             print("")
     else:
-        sniffer = create_sniffer_for_interface(
+        sniffer = create_sniffer(
             input_interface,
-            args.output_mode,
-            args.output_directory,
+            input_file,
+            output_mode,
+            output_directory,
+            dump_incomplete_flows,
+            workers
         )
         sniffer.start()
 

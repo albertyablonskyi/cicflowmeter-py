@@ -11,6 +11,7 @@ from cicflowmeter.features.flow_bytes import FlowBytes
 from cicflowmeter.features.packet_count import PacketCount
 from cicflowmeter.features.packet_length import PacketLength
 from cicflowmeter.features.packet_time import PacketTime
+from cicflowmeter.features.packet_index import PacketIndex
 from cicflowmeter.utils import get_statistics
 
 
@@ -86,6 +87,7 @@ class Flow:
         packet_count = PacketCount(self)
         packet_length = PacketLength(self)
         packet_time = PacketTime(self)
+        packet_index = PacketIndex(self)
         flow_iat = get_statistics(self.flow_interarrival_time)
         forward_iat = get_statistics(
             packet_time.get_packet_iat(PacketDirection.FORWARD)
@@ -192,8 +194,8 @@ class Flow:
             # "bwd_blk_rate_avg": float(
             #     flow_bytes.get_bulk_rate(PacketDirection.REVERSE)
             # ),
-            "noofpackets": len(self.packets_indexes),
-            "packets": "_".join(map(str, self.packets_indexes)),
+            "noofpackets": packet_count.get_total(),
+            "packets": packet_index.get_indexes(),
         }
 
         # Duplicated features
@@ -207,17 +209,19 @@ class Flow:
 
         return data
 
-    def add_packet(self, packet: Any, direction: Enum, index: int) -> None:
+    def add_packet(self, packet: Any, direction: Enum, pindex=None) -> None:
         """Adds a packet to the current list of packets.
 
         Args:
             packet: Packet to be added to a flow
             direction: The direction the packet is going in that flow
-            index: packet index in the PCAP file
+            pindex: packet index in the PCAP file
         """
         self.packets.append((packet, direction))
 
-        self.packets_indexes.append(index)
+        if pindex:
+            self.packets_indexes.append(pindex)
+
         # self.update_flow_bulk(packet, direction)
         self.update_subflow(packet)
 

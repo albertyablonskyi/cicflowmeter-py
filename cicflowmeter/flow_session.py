@@ -48,7 +48,7 @@ class FlowSession(DefaultSession):
             self.dump_incomplete_flows = False
 
         if self.output_mode == "csv":
-            self.executor = ProcessPoolExecutor(max_workers=5)
+            self.executor = ProcessPoolExecutor(max_workers=self.nb_workers)
 
             output_directory = Path(self.output_directory).resolve()
 
@@ -103,11 +103,8 @@ class FlowSession(DefaultSession):
         #     print("==========", self.packets_count)
         #     print(packet.show())
 
-        # try:
         # Creates a key variable to check a flow in the forward direction
         flow = self.flows.get(packet_flow_key)
-        # except Exception:
-        #     return
 
         # if check_cond:
         #     print("1.", self.packets_count)
@@ -203,7 +200,6 @@ class FlowSession(DefaultSession):
                 csv_writer.writerow(data.keys())
             csv_writer.writerow(data.values())
         self.nb_flows_completed += 1
-        # print(f"Completed {key}")
 
     def mark_incomplete_flows_as_completed(self):
         print("No. of incomplete flows:", len(self.flows))
@@ -229,7 +225,9 @@ class FlowSession(DefaultSession):
             _ = gc.collect()
 
 
-def generate_session_class(source_name, output_mode, output_directory, dump_incomplete_flows, show_packet_count):
+def generate_session_class(
+        source_name, output_mode, output_directory, dump_incomplete_flows, nb_workers, show_packet_count
+):
     return type(
         "NewFlowSession",
         (FlowSession,),
@@ -238,6 +236,7 @@ def generate_session_class(source_name, output_mode, output_directory, dump_inco
             "output_mode": output_mode,
             "output_directory": output_directory,
             "dump_incomplete_flows": dump_incomplete_flows,
+            "nb_workers": nb_workers,
             "show_packet_count": show_packet_count,
         },
     )
