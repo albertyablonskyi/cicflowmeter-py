@@ -73,12 +73,13 @@ class FlowSession(DefaultSession):
         # Sniffer finished all the packets it needed to sniff.
         # It is not a good place for this, we need to somehow define a finish signal for AsyncSniffer
 
-        if self.dump_incomplete_flows:
-            self.mark_incomplete_flows_as_completed()
+        if self.output_mode == "csv":
+            if self.dump_incomplete_flows:
+                self.mark_incomplete_flows_as_completed()
 
-        self.executor.shutdown(wait=True)
-        print("")
-        print("Dumped all the processed flows!")
+            self.executor.shutdown(wait=True)
+            print("")
+            print("Dumped all the processed flows!")
         return super(FlowSession, self).toPacketList()
 
     def on_packet_received(self, packet):
