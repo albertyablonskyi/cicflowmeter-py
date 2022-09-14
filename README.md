@@ -13,30 +13,32 @@ python3 setup.py install
 
 ### Usage
 ```sh
-sage: cicflowmeter [-h] (-i INPUT_INTERFACE | -f INPUT_FILE) [-c] [--in] [--dir OUTPUT_DIRECTORY]
+Usage: cicflowmeter [OPTIONS]
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -i INPUT_INTERFACE, --interface INPUT_INTERFACE
-                        capture online data from INPUT_INTERFACE
-  -f INPUT_FILE, --file INPUT_FILE
-                        capture offline data from a PCAP file or a folder containing PCAP files
-  -c, --csv             output flows as csv
-  --in                  Dump incomplete flows to the csv file before existing the program
-  --dir OUTPUT_DIRECTORY
-                        output directory (in csv mode)
+Options:
+  -i, --interface TEXT   Capture live data from the network interface.
+  -f, --pfile PATH       capture offline data from a PCAP file or a folder containing PCAP files.
+  -c, --csv              output flows as csv
+  -w, --workers INTEGER  No. of workers to write flows to a CSV file.  [default: 2]
+  --in                   Dump incomplete flows to the csv file before existing the program.
+  --dir DIRECTORY        output directory (in csv mode). [default: current directory]
+  --version              Show the version and exit.
+  --help                 Show this message and exit.
+
+Constraints:
+  {--interface, --pfile}  exactly 1 required
 ```
 
-Convert pcap file to flow csv:
+Convert the `example.pcap` PCAP file to a csv file containing flows in the `output_flows` folder:
 
 ```
-cicflowmeter -f example.pcap -c flows.csv
+cicflowmeter -f example.pcap -c --dir output_flows/
 ```
 
-Sniff packets real-time from interface to flow csv: (**need root permission**)
+Sniff packets real-time from interface: (**need root permission**)
 
 ```
-cicflowmeter -i eth0 -c flows.csv
+cicflowmeter -i eth0 -c --dir output_flows/
 ```
 
 - Reference: https://www.unb.ca/cic/research/applications.html#CICFlowMeter
