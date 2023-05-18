@@ -53,5 +53,10 @@ cicflowmeter -i eth0 -c --dir .
 
 ## Reference
 
-For more information about the CICFlowMeter and its applications, please refer to the [CICFlowMeter website](https://www.unb.ca/cic/research/applications.html#CICFlowMeter).
+- For more information about the CICFlowMeter and its applications, please refer to the [CICFlowMeter website](https://www.unb.ca/cic/research/applications.html#CICFlowMeter).
+
+- If you are using the CICIDS2017 dataset, please cite the related paper that outlines the details of the dataset and its underlying principles:
+
+  Iman Sharafaldin, Arash Habibi Lashkari, and Ali A. Ghorbani, “Toward Generating a New Intrusion Detection Dataset and Intrusion Traffic Characterization”, 4th International Conference on Information Systems Security and Privacy (ICISSP), Portugal, January 2018.
+
 
