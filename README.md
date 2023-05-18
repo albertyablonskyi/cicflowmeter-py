@@ -9,7 +9,7 @@ The NobilisIDS project can be found [here](https://github.com/albertyablonskyi/N
 To install and use the Python CICFlowMeter, follow these steps:
 
 ```sh
-git clone https://gitlab.abo.fi/tahmad/cicflowmeter-py
+git clone https://github.com/albertyablonskyi/cicflowmeter-py.git
 cd cicflowmeter
 python3 setup.py install
 ```
