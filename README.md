@@ -8,30 +8,32 @@ The NobilisIDS project can be found [here](https://github.com/albertyablonskyi/N
 
 To install and use the Python CICFlowMeter, follow these steps:
 
-1. Clone the repository:
-git clone https://github.com/albertyablonskyi/cicflowmeter-py.git
-cd cicflowmeter-py
+```sh
+git clone https://gitlab.abo.fi/tahmad/cicflowmeter-py
+cd cicflowmeter
+python3 setup.py install
+```
 
-2. Install the package:
-
-## Usage
+#### Usage
+```sh
 
 The Python CICFlowMeter provides command-line options to capture and analyze network traffic. Here are the available options:
 
 Usage: cicflowmeter [OPTIONS]
 
 Options:
--i, --interface TEXT Capture live data from the network interface.
--f, --pfile PATH Capture offline data from a PCAP file or a folder containing PCAP files.
--c, --csv Output flows as CSV.
--w, --workers INTEGER Number of workers to write flows to a CSV file. [default: 2]
---in Dump incomplete flows to the CSV file before exiting the program.
---dir DIRECTORY Output directory (in CSV mode). [default: current directory]
---version Show the version and exit.
---help Show this message and exit.
+  -i, --interface TEXT   Capture live data from the network interface.
+  -f, --pfile PATH       capture offline data from a PCAP file or a folder containing PCAP files.
+  -c, --csv              output flows as csv
+  -w, --workers INTEGER  No. of workers to write flows to a CSV file.  [default: 2]
+  --in                   Dump incomplete flows to the csv file before existing the program.
+  --dir DIRECTORY        output directory (in csv mode). [default: current directory]
+  --version              Show the version and exit.
+  --help                 Show this message and exit.
 
-**Constraints:**
-- You must use either `--interface` or `--pfile`, but not both.
+Constraints:
+  {--interface, --pfile}  exactly 1 required
+```
 
 ### Convert PCAP file to CSV
 
