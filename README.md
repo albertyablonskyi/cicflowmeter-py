@@ -1,44 +1,55 @@
-# Python CICFlowMeter
+# NobilisIDS CICFlowMeter
 
-> This project is cloned from [Python Wrapper CICflowmeter](https://github.com/datthinh1801/cicflowmeter) and customized to fit my need.  
+This project is a fork of the Python CICFlowMeter, customized to suit the needs of the NobilisIDS project. It includes changes to the output format of the .csv file and a workaround for dropping packets other than IP TCP/UDP.
 
+The NobilisIDS project can be found [here](https://github.com/albertyablonskyi/NobilisIDS.git), which is the repository customized for your specific use case.
 
-### Installation
-```sh
-git clone https://gitlab.abo.fi/tahmad/cicflowmeter-py
-cd cicflowmeter
-python3 setup.py install
-```
+## Installation
 
+To install and use the Python CICFlowMeter, follow these steps:
 
-### Usage
-```sh
+1. Clone the repository:
+git clone https://github.com/albertyablonskyi/cicflowmeter-py.git
+cd cicflowmeter-py
+
+2. Install the package:
+
+## Usage
+
+The Python CICFlowMeter provides command-line options to capture and analyze network traffic. Here are the available options:
+
 Usage: cicflowmeter [OPTIONS]
 
 Options:
-  -i, --interface TEXT   Capture live data from the network interface.
-  -f, --pfile PATH       capture offline data from a PCAP file or a folder containing PCAP files.
-  -c, --csv              output flows as csv
-  -w, --workers INTEGER  No. of workers to write flows to a CSV file.  [default: 2]
-  --in                   Dump incomplete flows to the csv file before existing the program.
-  --dir DIRECTORY        output directory (in csv mode). [default: current directory]
-  --version              Show the version and exit.
-  --help                 Show this message and exit.
+-i, --interface TEXT Capture live data from the network interface.
+-f, --pfile PATH Capture offline data from a PCAP file or a folder containing PCAP files.
+-c, --csv Output flows as CSV.
+-w, --workers INTEGER Number of workers to write flows to a CSV file. [default: 2]
+--in Dump incomplete flows to the CSV file before exiting the program.
+--dir DIRECTORY Output directory (in CSV mode). [default: current directory]
+--version Show the version and exit.
+--help Show this message and exit.
 
-Constraints:
-  {--interface, --pfile}  exactly 1 required
-```
+**Constraints:**
+- You must use either `--interface` or `--pfile`, but not both.
 
-Convert the `example.pcap` PCAP file to a csv file containing flows in the `output_flows` folder:
+### Convert PCAP file to CSV
 
-```
-cicflowmeter -f example.pcap -c --dir output_flows/
-```
+To convert a PCAP file to a CSV file containing flows in the `output_flows` folder, use the following command:
 
-Sniff packets real-time from interface: (**need root permission**)
+cicflowmeter -f example.pcap -c --dir .
 
-```
-cicflowmeter -i eth0 -c --dir output_flows/
-```
+### Sniff packets in real-time from an interface
 
-- Reference: https://www.unb.ca/cic/research/applications.html#CICFlowMeter
+To capture and analyze packets in real-time from the `eth0` interface (requires root permission), use the following command:
+
+### Sniff packets in real-time from an interface
+
+To capture and analyze packets in real-time from the `eth0` interface (requires root permission), use the following command:
+
+cicflowmeter -i eth0 -c --dir .
+
+## Reference
+
+For more information about the CICFlowMeter and its applications, please refer to the [CICFlowMeter website](https://www.unb.ca/cic/research/applications.html#CICFlowMeter).
+

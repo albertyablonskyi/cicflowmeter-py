@@ -85,6 +85,10 @@ class FlowSession(DefaultSession):
     def on_packet_received(self, packet):
         direction = PacketDirection.FORWARD
 
+        if "TCP" not in packet and "UDP" not in packet:
+            print("Not TCP or UDP, dropping...")
+            return None
+
         self.packets_count += 1
 
         if self.show_packet_count:
