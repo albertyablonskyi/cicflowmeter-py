@@ -2,7 +2,7 @@
 
 This project is a fork of the Python CICFlowMeter, customized to suit the needs of the NobilisIDS project. It includes changes to the output format of the .csv file and a workaround for dropping packets other than IP TCP/UDP.
 
-The NobilisIDS project can be found [here](https://github.com/albertyablonskyi/NobilisIDS.git), which is the repository customized for your specific use case.
+The NobilisIDS project can be found [here](https://github.com/albertyablonskyi/NobilisIDS.git).
 
 ## Installation
 
