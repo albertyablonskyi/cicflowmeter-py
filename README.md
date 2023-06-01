@@ -1,6 +1,6 @@
 # NobilisIDS CICFlowMeter
 
-The NobilisIDS CICFlowMeter is a customized version of the Python CICFlowMeter, designed specifically for the NobilisIDS project. It includes modifications to the output format of the .csv file and a workaround for dropping packets other than IP TCP/UDP.
+The NobilisIDS CICFlowMeter is a customized version of the Python CICFlowMeter, designed specifically for the **[NobilisIDS](https://github.com/albertyablonskyi/NobilisIDS)** project. It includes modifications to the output format of the .csv file and a workaround for dropping packets other than IP TCP/UDP.
 
 ## Installation
 
